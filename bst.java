@@ -12,23 +12,20 @@ class Node {
 
 class bst {
 
-    // Function to insert a new node with the given key
+    // Insert a new node with the given key
     static Node insert(Node root, int key) {
         if (root == null) {
             return new Node(key);
         }
-        if (root.key == key) {
-            return root; // Key is already present, so we return the root
-        }
         if (key < root.key) {
             root.left = insert(root.left, key);
-        } else {
+        } else if (key > root.key) {
             root.right = insert(root.right, key);
         }
         return root;
     }
 
-    // Function to search for a key in the BST
+    // Search for a key in the BST
     static Node search(Node root, int key) {
         if (root == null || root.key == key) {
             return root;
@@ -39,37 +36,28 @@ class bst {
         return search(root.right, key);
     }
 
-    // Function to delete a node with key x from the BST
-    static Node delNode(Node root, int x) {
+    // Delete a node with the given key
+    static Node delNode(Node root, int key) {
         if (root == null) {
             return root;
         }
-        if (x < root.key) {
-            root.left = delNode(root.left, x);
-        } else if (x > root.key) {
-            root.right = delNode(root.right, x);
+
+        if (key < root.key) {
+            root.left = delNode(root.left, key);
+        } else if (key > root.key) {
+            root.right = delNode(root.right, key);
         } else {
-            // Node to be deleted is found
+            if (root.left == null) return root.right;
+            if (root.right == null) return root.left;
 
-            // Case 1: Node has no children or only right child
-            if (root.left == null) {
-                return root.right;
-            }
-
-            // Case 2: Node has only left child
-            if (root.right == null) {
-                return root.left;
-            }
-
-            // Case 3: Node has both children
             Node succ = getSuccessor(root);
             root.key = succ.key;
-            root.right = delNode(root.right, succ.key); // Delete the successor
+            root.right = delNode(root.right, succ.key);
         }
         return root;
     }
 
-    // Function to find the inorder successor of a node
+    // Find inorder successor
     static Node getSuccessor(Node curr) {
         curr = curr.right;
         while (curr != null && curr.left != null) {
@@ -78,7 +66,7 @@ class bst {
         return curr;
     }
 
-    // Utility function to do inorder traversal
+    // Inorder traversal
     static void inorder(Node root) {
         if (root != null) {
             inorder(root.left);
@@ -87,30 +75,24 @@ class bst {
         }
     }
 
-    // Function to calculate the height of the tree
+    // Tree height
     static int height(Node root) {
-        if (root == null) {
-            return 0;
-        }
-        int leftHeight = height(root.left);
-        int rightHeight = height(root.right);
-        return Math.max(leftHeight, rightHeight) + 1;
+        if (root == null) return 0;
+        return Math.max(height(root.left), height(root.right)) + 1;
     }
 
-    // Function to print nodes at a specific level
+    // Print nodes at a specific level
     static void printLevel(Node root, int level) {
-        if (root == null) {
-            return;
-        }
+        if (root == null) return;
         if (level == 1) {
             System.out.print(root.key + " ");
-        } else if (level > 1) {
+        } else {
             printLevel(root.left, level - 1);
             printLevel(root.right, level - 1);
         }
     }
 
-    // Function to print level-order traversal
+    // Level-order traversal
     static void levelOrder(Node root) {
         int h = height(root);
         for (int i = 1; i <= h; i++) {
@@ -119,11 +101,9 @@ class bst {
         }
     }
 
-    // Function to mirror the tree
+    // Mirror the tree
     static Node mirror(Node root) {
-        if (root == null) {
-            return root;
-        }
+        if (root == null) return root;
         Node temp = root.left;
         root.left = root.right;
         root.right = temp;
@@ -132,8 +112,8 @@ class bst {
         return root;
     }
 
-    // Driver code
-     public static void main(String[] args) {
+    // Main driver method
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         Node root = null;
 
@@ -146,24 +126,40 @@ class bst {
         }
 
         while (true) {
-            System.out.println("\nChoose operation:\n1. Inorder Traversal\n2. Level-order Traversal\n3. Search\n4. Delete\n5. Mirror\n6. Exit");
+            System.out.println("\nChoose operation:");
+            System.out.println("1. Insert");
+            System.out.println("2. Inorder Traversal");
+            System.out.println("3. Level-order Traversal");
+            System.out.println("4. Search");
+            System.out.println("5. Delete");
+            System.out.println("6. Mirror");
+            System.out.println("7. Exit");
+
             int choice = sc.nextInt();
             switch (choice) {
                 case 1:
-                    System.out.print("Inorder traversal: ");
+                    System.out.println("Enter value to insert:");
+                    int value = sc.nextInt();
+                    root = insert(root, value);
+                    System.out.print("Inorder traversal after insert: ");
                     inorder(root);
                     System.out.println();
                     break;
                 case 2:
+                    System.out.print("Inorder traversal: ");
+                    inorder(root);
+                    System.out.println();
+                    break;
+                case 3:
                     System.out.println("Level-order traversal:");
                     levelOrder(root);
                     break;
-                case 3:
+                case 4:
                     System.out.println("Enter value to search:");
                     int searchKey = sc.nextInt();
                     System.out.println(search(root, searchKey) != null ? "Found" : "Not Found");
                     break;
-                case 4:
+                case 5:
                     System.out.println("Enter value to delete:");
                     int keyToDelete = sc.nextInt();
                     root = delNode(root, keyToDelete);
@@ -171,13 +167,13 @@ class bst {
                     inorder(root);
                     System.out.println();
                     break;
-                case 5:
+                case 6:
                     root = mirror(root);
                     System.out.print("Inorder traversal after mirroring: ");
                     inorder(root);
                     System.out.println();
                     break;
-                case 6:
+                case 7:
                     System.out.println("Exiting...");
                     sc.close();
                     return;
@@ -187,5 +183,3 @@ class bst {
         }
     }
 }
-
-
